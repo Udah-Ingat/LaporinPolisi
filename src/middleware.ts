@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { auth } from "@/server/auth";
+import { getToken } from "next-auth/jwt";
+
+const secret = process.env.AUTH_SECRET;
 
 export async function middleware(request: NextRequest) {
-  const session = await auth();
+  const token = await getToken({ req: request, secret });
   const { pathname } = request.nextUrl;
 
   // Protected routes that require authentication
@@ -15,14 +17,14 @@ export async function middleware(request: NextRequest) {
   const isAdminRoute = adminRoutes.some(route => pathname.startsWith(route));
 
   // Redirect to login if accessing protected route without session
-  if (isProtectedRoute && !session) {
+  if (isProtectedRoute && !token) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("callbackUrl", pathname);
     return NextResponse.redirect(loginUrl);
   }
 
   // Redirect to home if accessing admin route without admin privileges
-  if (isAdminRoute && (!session?.user.isAdmin)) {
+  if (isAdminRoute && (!token?.isAdmin)) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 

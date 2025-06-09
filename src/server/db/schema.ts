@@ -1,14 +1,8 @@
 import { relations, sql } from "drizzle-orm";
 import {
   index,
-  integer,
   pgTableCreator,
-  primaryKey,
-  text,
-  timestamp,
-  varchar,
-  boolean,
-  jsonb,
+  primaryKey
 } from "drizzle-orm/pg-core";
 import { type AdapterAccount } from "next-auth/adapters";
 
