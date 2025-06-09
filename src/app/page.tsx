@@ -1,69 +1,102 @@
-import Link from "next/link";
+"use client";
 
-import { LatestPost } from "@/app/_components/post";
-import { auth } from "@/server/auth";
-import { api, HydrateClient } from "@/trpc/server";
+import { useState } from "react";
+import { Search, Filter } from "lucide-react";
+import { api } from "@/trpc/react";
+import { ReportCard } from "@/components/report/report-card";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
-export default async function Home() {
-  const hello = await api.post.hello({ text: "from tRPC" });
-  const session = await auth();
+export default function HomePage() {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [selectedLocation, setSelectedLocation] = useState("");
+  const [sortBy, setSortBy] = useState<"latest" | "popular">("latest");
 
-  if (session?.user) {
-    void api.post.getLatest.prefetch();
-  }
+  const { data: reports, isLoading } = api.report.getAll.useQuery({
+    search: searchQuery || undefined,
+    tags: selectedTags.length > 0 ? selectedTags : undefined,
+    location: selectedLocation || undefined,
+    sortBy,
+  });
 
   return (
-    <HydrateClient>
-      <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
-        <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
-          <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
-            Create <span className="text-[hsl(280,100%,70%)]">T3</span> App
-          </h1>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-8">
-            <Link
-              className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
-              href="https://create.t3.gg/en/usage/first-steps"
-              target="_blank"
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="sticky top-0 z-40 bg-white border-b border-gray-200">
+        <div className="p-4">
+          {/* Search Bar */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <input
+              type="text"
+              placeholder="Cari laporan..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-12 py-3 bg-green-100 rounded-full text-gray-900 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500"
+            />
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-gray-900"
             >
-              <h3 className="text-2xl font-bold">First Steps →</h3>
-              <div className="text-lg">
-                Just the basics - Everything you need to know to set up your
-                database and authentication.
-              </div>
-            </Link>
-            <Link
-              className="flex max-w-xs flex-col gap-4 rounded-xl bg-white/10 p-4 hover:bg-white/20"
-              href="https://create.t3.gg/en/introduction"
-              target="_blank"
-            >
-              <h3 className="text-2xl font-bold">Documentation →</h3>
-              <div className="text-lg">
-                Learn more about Create T3 App, the libraries it uses, and how
-                to deploy it.
-              </div>
-            </Link>
+              <Filter className="w-5 h-5" />
+            </button>
           </div>
-          <div className="flex flex-col items-center gap-2">
-            <p className="text-2xl text-white">
-              {hello ? hello.greeting : "Loading tRPC query..."}
-            </p>
 
-            <div className="flex flex-col items-center justify-center gap-4">
-              <p className="text-center text-2xl text-white">
-                {session && <span>Logged in as {session.user?.name}</span>}
-              </p>
-              <Link
-                href={session ? "/api/auth/signout" : "/api/auth/signin"}
-                className="rounded-full bg-white/10 px-10 py-3 font-semibold no-underline transition hover:bg-white/20"
-              >
-                {session ? "Sign out" : "Sign in"}
-              </Link>
+          {/* Filter Options */}
+          {showFilters && (
+            <div className="mt-4 space-y-3">
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setSortBy("latest")}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                    sortBy === "latest"
+                      ? "bg-green-600 text-white"
+                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                  }`}
+                >
+                  Terbaru
+                </button>
+                <button
+                  onClick={() => setSortBy("popular")}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                    sortBy === "popular"
+                      ? "bg-green-600 text-white"
+                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                  }`}
+                >
+                  Populer
+                </button>
+              </div>
+              
+              <input
+                type="text"
+                placeholder="Filter lokasi..."
+                value={selectedLocation}
+                onChange={(e) => setSelectedLocation(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+              />
             </div>
-          </div>
-
-          {session?.user && <LatestPost />}
+          )}
         </div>
+      </header>
+
+      {/* Content */}
+      <main className="p-4 space-y-4">
+        {isLoading ? (
+          <div className="flex justify-center py-8">
+            <LoadingSpinner />
+          </div>
+        ) : reports && reports.length > 0 ? (
+          reports.map((report) => (
+            <ReportCard key={report.id} report={report} />
+          ))
+        ) : (
+          <div className="text-center py-8 text-gray-500">
+            Belum ada laporan
+          </div>
+        )}
       </main>
-    </HydrateClient>
+    </div>
   );
 }
