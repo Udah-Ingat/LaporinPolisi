@@ -21,6 +21,8 @@
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.7.2",
+    "@hookform/resolvers": "^5.1.1",
+    "@supabase/supabase-js": "^2.50.0",
     "@t3-oss/env-nextjs": "^0.12.0",
     "@tanstack/react-query": "^5.69.0",
     "@trpc/client": "^11.0.0",
@@ -32,9 +34,13 @@
     "postgres": "^3.4.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-hook-form": "^7.57.0",
     "server-only": "^0.0.1",
+    "sonner": "^2.0.5",
+    "supabase": "^2.24.3",
     "superjson": "^2.2.1",
-    "zod": "^3.24.2"
+    "zod": "^3.25.56",
+    "zustand": "^5.0.5"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
@@ -42,7 +48,7 @@
     "@types/node": "^20.14.10",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "drizzle-kit": "^0.30.5",
+    "drizzle-kit": "^0.30.6",
     "eslint": "^9.23.0",
     "eslint-config-next": "^15.2.3",
     "eslint-plugin-drizzle": "^0.2.3",
