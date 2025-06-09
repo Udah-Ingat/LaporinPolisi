@@ -1,7 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { z } from "zod";
-import { eq, desc, like, or, and, sql } from "drizzle-orm";
+import { eq, desc, like, or, and, sql, inArray } from "drizzle-orm";
 import {
   createTRPCRouter,
   protectedProcedure,
@@ -90,112 +88,108 @@ export const reportRouter = createTRPCRouter({
   // Get all reports with filters
   getAll: publicProcedure
     .input(
-      z.object({
+        z.object({
         limit: z.number().min(1).max(100).default(20),
         offset: z.number().default(0),
         search: z.string().optional(),
         location: z.string().optional(),
         tags: z.array(z.string()).optional(),
         sortBy: z.enum(["latest", "popular"]).default("latest"),
-      }),
+        }),
     )
     .query(async ({ ctx, input }) => {
-      let query = ctx.db
+        let reportIds: number[] | undefined;
+        if (input.tags && input.tags.length > 0) {
+        const reportsWithTags = await ctx.db
+            .selectDistinct({ reportId: reportTags.reportId })
+            .from(reportTags)
+            .innerJoin(tags, eq(reportTags.tagId, tags.id))
+            .where(
+            inArray(
+                tags.name, 
+                input.tags.map(t => t.toLowerCase())
+            )
+            );
+        
+        reportIds = reportsWithTags.map(r => r.reportId);
+        if (reportIds.length === 0) return [];
+        }
+
+        // Build conditions
+        const conditions = [
+        eq(reports.status, "active"),
+        input.search
+            ? or(
+                like(reports.title, `%${input.search}%`),
+                like(reports.description, `%${input.search}%`),
+            )
+            : undefined,
+        input.location
+            ? like(reports.location, `%${input.location}%`)
+            : undefined,
+        reportIds ? inArray(reports.id, reportIds) : undefined,
+        ].filter(Boolean);
+
+        // Execute query
+        const results = await ctx.db
         .select({
-          report: reports,
-          user: {
+            report: reports,
+            user: {
             id: users.id,
             name: users.name,
             image: users.image,
-          },
-          likesCount: sql<number>`count(distinct ${likes.userId})`,
-          commentsCount: sql<number>`count(distinct ${comments.id})`,
-          likedByUser: ctx.session?.user
-            ? sql<boolean>`bool_or(${likes.userId} = ${ctx.session.user.id})`
+            },
+            likesCount: sql<number>`count(distinct ${likes.userId})`,
+            commentsCount: sql<number>`count(distinct ${comments.id})`,
+            likedByUser: ctx.session?.user
+            ? sql<boolean>`coalesce(bool_or(${likes.userId} = ${ctx.session.user.id}), false)`
             : sql<boolean>`false`,
         })
         .from(reports)
         .leftJoin(users, eq(reports.createdById, users.id))
         .leftJoin(likes, eq(reports.id, likes.reportId))
         .leftJoin(comments, eq(reports.id, comments.reportId))
-        .where(
-          and(
-            eq(reports.status, "active"),
-            input.search
-              ? or(
-                  like(reports.title, `%${input.search}%`),
-                  like(reports.description, `%${input.search}%`),
-                )
-              : undefined,
-            input.location
-              ? like(reports.location, `%${input.location}%`)
-              : undefined,
-          ),
+        .where(and(...conditions))
+        .groupBy(reports.id, users.id)
+        .orderBy(
+            input.sortBy === "popular"
+            ? desc(sql`count(distinct ${likes.userId})`)
+            : desc(reports.createdAt)
         )
-        .groupBy(reports.id, users.id);
+        .limit(input.limit)
+        .offset(input.offset);
 
-      // Handle tag filtering
-      if (input.tags && input.tags.length > 0) {
-        const reportsWithTags = await ctx.db
-          .select({ reportId: reportTags.reportId })
-          .from(reportTags)
-          .innerJoin(tags, eq(reportTags.tagId, tags.id))
-          .where(
-            sql`${tags.name} = ANY(${input.tags.map((t) => t.toLowerCase())})`,
-          );
+        // Get report IDs from results
+        const resultReportIds = results.map(r => r.report.id);
 
-        const reportIds = reportsWithTags.map((r) => r.reportId);
-        if (reportIds.length > 0) {
-          query = query.where(
-            and(
-              eq(reports.status, "active"),
-              sql`${reports.id} = ANY(${reportIds})`,
-            ),
-          );
-        }
-      }
-
-      // Apply sorting
-      if (input.sortBy === "popular") {
-        query = query.orderBy(desc(sql`count(distinct ${likes.userId})`));
-      } else {
-        query = query.orderBy(desc(reports.createdAt));
-      }
-
-      // Apply pagination
-      query = query.limit(input.limit).offset(input.offset);
-
-      const results = await query;
-
-      // Get tags for each report
-      const reportIds = results.map((r) => r.report.id);
-      const reportTagsData = await ctx.db
+        // Get tags for reports in current page
+        const reportTagsData = await ctx.db
         .select({
-          reportId: reportTags.reportId,
-          tag: tags,
+            reportId: reportTags.reportId,
+            tag: tags,
         })
         .from(reportTags)
         .innerJoin(tags, eq(reportTags.tagId, tags.id))
-        .where(sql`${reportTags.reportId} = ANY(${reportIds})`);
+        .where(inArray(reportTags.reportId, resultReportIds));
 
-      // Group tags by report
-      const tagsByReport = reportTagsData.reduce(
+        // Group tags by report ID
+        const tagsByReport = reportTagsData.reduce(
         (acc, rt) => {
-          acc[rt.reportId] ??= [];
-          acc[rt.reportId]!.push(rt.tag);
-          return acc;
+            acc[rt.reportId] ??= [];
+            acc[rt.reportId]!.push(rt.tag);
+            return acc;
         },
-        {} as Record<number, typeof tags.$inferSelect[]>,
-      );
+        {} as Record<number, (typeof tags.$inferSelect)[]>
+        );
 
-      return results.map((r) => ({
+        return results.map(r => ({
         ...r.report,
         user: r.user,
         likesCount: Number(r.likesCount),
         commentsCount: Number(r.commentsCount),
         likedByUser: r.likedByUser,
         tags: tagsByReport[r.report.id] ?? [],
-      }));
+        }));
     }),
 
   // Get single report by ID
