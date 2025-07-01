@@ -2,6 +2,7 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { posts } from "@/server/db/schema";
 import { db } from "@/server/db";
+import { desc, count } from "drizzle-orm";
 
 export const postRouter = createTRPCRouter({
   create: protectedProcedure
@@ -30,5 +31,37 @@ export const postRouter = createTRPCRouter({
         imgUrl: input.imgUrl,
         createdById: userId,
       });
+    }),
+
+  getAllPaginated: protectedProcedure
+    .input(
+      z.object({
+        page: z.number().min(1).default(1),
+        limit: z.number().min(1).max(100).default(10),
+      }),
+    )
+    .query(async ({ input }) => {
+      const offset = (input.page - 1) * input.limit;
+
+      const [items, total] = await Promise.all([
+        db
+          .select()
+          .from(posts)
+          .orderBy(desc(posts.createdAt))
+          .limit(input.limit)
+          .offset(offset),
+
+        db
+          .select({ count: count() })
+          .from(posts)
+          .then((res) => res[0]?.count ?? 0),
+      ]);
+
+      return {
+        items,
+        total,
+        page: input.page,
+        totalPages: Math.ceil(total / input.limit),
+      };
     }),
 });
