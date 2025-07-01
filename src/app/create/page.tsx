@@ -21,7 +21,7 @@ const Page = () => {
 
   return (
     <div className="w-full bg-white">
-      <div className="bg-lapor-pink-light h-32 w-full"></div>
+      <div className="bg-lapor-pink-light h-28 w-full"></div>
       <Image
         src="https://lh3.googleusercontent.com/a/ACg8ocKxzeAWJ7scN3ZvNiO24dhduRR7AveoTlH3WDPehIBauZw3XSmI=s96-c"
         alt="Profile picture"
