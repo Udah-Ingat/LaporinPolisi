@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
-import { posts } from "@/server/db/schema";
+import { posts, users, votes } from "@/server/db/schema";
 import { db } from "@/server/db";
-import { desc, count } from "drizzle-orm";
+import { desc, count, eq, sql } from "drizzle-orm";
 
 export const postRouter = createTRPCRouter({
   create: protectedProcedure
@@ -43,22 +43,62 @@ export const postRouter = createTRPCRouter({
     .query(async ({ input }) => {
       const offset = (input.page - 1) * input.limit;
 
-      const [items, total] = await Promise.all([
+      const [items, totalResult] = await Promise.all([
         db
-          .select()
+          .select({
+            id: posts.id,
+            title: posts.title,
+            city: posts.city,
+            imgUrl: posts.imgUrl,
+            createdAt: posts.createdAt,
+            updatedAt: posts.updatedAt,
+            isVerified: posts.isVerified,
+            userImage: users.image,
+            username: users.name,
+            upVoteCount: sql<number>`
+                COALESCE(
+                    SUM(CASE 
+                    WHEN ${votes.isUpVote} IS TRUE THEN 1
+                    WHEN ${votes.isUpVote} IS FALSE THEN -1
+                    ELSE 0
+                    END), 
+                    0
+                )
+                `.as("upVoteCount"),
+          })
           .from(posts)
+          .leftJoin(users, eq(posts.createdById, users.id))
+          .leftJoin(votes, eq(votes.postId, posts.id))
+          .groupBy(posts.id, users.id)
           .orderBy(desc(posts.createdAt))
           .limit(input.limit)
           .offset(offset),
 
-        db
-          .select({ count: count() })
-          .from(posts)
-          .then((res) => res[0]?.count ?? 0),
+        db.select({ count: count() }).from(posts),
       ]);
 
+      const total = Number(totalResult[0]?.count ?? 0);
+
       return {
-        items,
+        items: items.map((item) => ({
+          id: item.id,
+          title: item.title,
+          city: item.city,
+          imgUrl: item.imgUrl,
+          updatedAt: (() => {
+            const d = new Date(item.updatedAt ?? item.createdAt);
+            const day = d.getDate().toString().padStart(2, "0");
+            const month = (d.getMonth() + 1).toString().padStart(2, "0");
+            const year = d.getFullYear();
+            const hour = d.getHours().toString().padStart(2, "0");
+            const minute = d.getMinutes().toString().padStart(2, "0");
+            return `${day}-${month}-${year} : ${hour}.${minute}`;
+          })(),
+          isVerified: item.isVerified,
+          profileImgUrl: item.userImage ?? "",
+          username: item.username ?? "Unknown",
+          upVoteCount: item.upVoteCount ?? 0,
+        })),
         total,
         page: input.page,
         totalPages: Math.ceil(total / input.limit),

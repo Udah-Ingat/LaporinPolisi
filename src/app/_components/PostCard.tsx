@@ -2,34 +2,38 @@ import Image from "next/image";
 import React from "react";
 
 export type PostCardProps = {
-  postId: number;
-  profileImageUrl: string;
+  id: string;
+  profileImgUrl: string;
   username: string;
-  location: string;
-  dateTime: string;
-  postImageUrl: string;
-  postContent: string;
-  upvoteCount: number;
+  title: string;
+  city: string | null;
+  updatedAt: string;
+  imgUrl: string | null;
+  upVoteCount: number;
   isVerified: boolean;
 };
 
 const PostCard: React.FC<PostCardProps> = ({
-  profileImageUrl,
+  id,
+  profileImgUrl,
   username,
-  location,
-  dateTime,
-  postImageUrl,
-  postContent,
-  upvoteCount,
+  title,
+  city,
+  updatedAt,
+  imgUrl,
+  upVoteCount,
   isVerified,
 }) => {
   return (
-    <div className="bg-lapor-yellow mx-4 flex items-center justify-center gap-2 rounded-2xl p-3 text-xs shadow-md/30">
-      <div className="flex w-2/3 flex-col items-center justify-center gap-1">
+    <div
+      onClick={() => alert("Clicked post: " + id)}
+      className="bg-lapor-yellow mx-4 flex items-center justify-center gap-2 rounded-2xl p-3 text-xs shadow-md/30"
+    >
+      <div className="flex w-2/3 flex-col items-center justify-center gap-2">
         <div className="flex w-full items-center justify-center gap-1">
           <div className="w-3/12">
             <Image
-              src={profileImageUrl}
+              src={profileImgUrl}
               alt="test image"
               width="20"
               height="20"
@@ -40,13 +44,15 @@ const PostCard: React.FC<PostCardProps> = ({
             <div className="bg-lapor-green w-full rounded-lg px-2 py-[1px] text-white">
               {username}
             </div>
-            <div className="text-lapor-gray flex w-full items-center justify-between px-1 text-[9px]">
-              <div>{location}</div>
-              <div>{dateTime}</div>
+            <div className="text-lapor-gray flex w-full items-center justify-between text-[9px]">
+              <div>{city}</div>
+              <div>{updatedAt}</div>
             </div>
           </div>
         </div>
-        <div>{postContent}</div>
+        <div className="flex w-full items-center justify-start">
+          <div>{title}</div>
+        </div>
         <div className="flex items-center justify-center gap-2">
           <div>
             {isVerified ? (
@@ -75,7 +81,7 @@ const PostCard: React.FC<PostCardProps> = ({
                 height="10"
               ></Image>
             </div>
-            <div>{upvoteCount}</div>
+            <div>{upVoteCount}</div>
             <div>
               <Image
                 src="down_arrow_icon.svg"
@@ -89,7 +95,9 @@ const PostCard: React.FC<PostCardProps> = ({
       </div>
       <div className="flex w-1/3 items-center justify-center">
         <Image
-          src={postImageUrl}
+          src={
+            (imgUrl ?? "") == "" ? "home_icon.svg" : (imgUrl ?? "home_icon.svg")
+          }
           alt="test image"
           width="100"
           height="100"

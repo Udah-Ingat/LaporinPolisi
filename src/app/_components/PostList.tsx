@@ -1,29 +1,27 @@
-import React from "react";
-import PostCard from "./PostCard";
-import { type PostCardProps } from "./PostCard";
+"use client";
 
-const testData: PostCardProps = {
-  postId: 1,
-  profileImageUrl:
-    "https://lh3.googleusercontent.com/a/ACg8ocKxzeAWJ7scN3ZvNiO24dhduRR7AveoTlH3WDPehIBauZw3XSmI=s96-c",
-  username: "Andi Farhan",
-  location: "Bandung",
-  dateTime: "2025-04-03 : 13.59",
-  postImageUrl: "/download.jpg",
-  postContent:
-    "Lorem ipsum, dolor sit amet consectetur adipisicing elit. Quo molestiae ipsum dolorem deserunt eum doloremque, aut architecto expedita culpa ipsa.",
-  upvoteCount: 20000,
-  isVerified: true,
-};
+import React, { useState } from "react";
+import PostCard from "./PostCard";
+import { api } from "@/trpc/react";
 
 const PostList = () => {
+  const [page, setPage] = useState(1);
+  const limit = 10;
+
+  const { data, isLoading, isError } = api.post.getAllPaginated.useQuery({
+    page,
+    limit,
+  });
+
+  if (isLoading) return <p>Loading...</p>;
+  if (isError) return <p>Error loading posts.</p>;
+
   return (
     <div>
-      <div className="flex flex-col items-center justify-center gap-3">
-        <PostCard {...testData} />
-        <PostCard {...testData} />
-        <PostCard {...testData} />
-        <PostCard {...testData} />
+      <div className="min-h-screen flex flex-col items-center justify-center gap-3">
+        {data?.items.map((post, index) => (
+          <PostCard {...post} key={index} />
+        ))}
       </div>
     </div>
   );
