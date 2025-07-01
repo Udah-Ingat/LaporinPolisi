@@ -3,6 +3,7 @@ import PostCard from "./PostCard";
 import { type PostCardProps } from "./PostCard";
 
 const testData: PostCardProps = {
+  postId: 1,
   profileImageUrl:
     "https://lh3.googleusercontent.com/a/ACg8ocKxzeAWJ7scN3ZvNiO24dhduRR7AveoTlH3WDPehIBauZw3XSmI=s96-c",
   username: "Andi Farhan",

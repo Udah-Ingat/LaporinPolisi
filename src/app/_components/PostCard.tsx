@@ -2,6 +2,7 @@ import Image from "next/image";
 import React from "react";
 
 export type PostCardProps = {
+  postId: number;
   profileImageUrl: string;
   username: string;
   location: string;
