@@ -20,4 +20,12 @@
   --font-sans:
     var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --color-lapor-green: #5f8b4c;
+  --color-lapor-yellow: #ffddab;
+  --color-lapor-pink: #ff9a9a;
+  --color-lapor-brown: #945034;
+  --color-lapor-success: #55c055;
+  --color-lapor-red: #b32349;
+  --color-lapor-black: #2c2c2c;
+  --color-lapor-white: #E3E3E3;
 }
