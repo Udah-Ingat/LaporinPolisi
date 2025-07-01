@@ -32,6 +32,7 @@ export const posts = createTable(
     }),
     city: d.varchar({ length: 255 }),
     imgUrl: d.varchar({ length: 255 }),
+    isVerified: d.boolean().notNull().default(false),
     createdById: d
       .uuid()
       .notNull()
