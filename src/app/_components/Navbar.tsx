@@ -1,28 +1,35 @@
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 
 const Navbar = () => {
   return (
-    <div className="w-full py-3 z-10 shadow-md/30 sticky bottom-0 bg-white mt-5">
+    <div className="sticky bottom-0 z-10 mt-5 w-full bg-white py-3 shadow-md/30">
       <div className="flex items-center justify-around">
-        <Image
-          src="home_icon.svg"
-          alt="home icon"
-          width="28"
-          height="28"
-        ></Image>
-        <Image
-          src="create_icon.svg"
-          alt="create icon"
-          width="28"
-          height="28"
-        ></Image>
-        <Image
-          src="profile_icon.svg"
-          alt="profile icon"
-          width="28"
-          height="28"
-        ></Image>
+        <Link href={"/"}>
+          <Image
+            src="home_icon.svg"
+            alt="home icon"
+            width="28"
+            height="28"
+          ></Image>
+        </Link>
+        <Link href={"/create"}>
+          <Image
+            src="create_icon.svg"
+            alt="create icon"
+            width="28"
+            height="28"
+          ></Image>
+        </Link>
+        <Link href={"/profile"}>
+          <Image
+            src="profile_icon.svg"
+            alt="profile icon"
+            width="28"
+            height="28"
+          ></Image>
+        </Link>
       </div>
     </div>
   );

@@ -1,0 +1,146 @@
+"use client";
+
+import React, { useState } from "react";
+import Navbar from "../_components/Navbar";
+import Image from "next/image";
+
+const Page = () => {
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [status, setStatus] = useState("");
+  const [city, setCity] = useState("");
+  const [, setProve] = useState<File | null>(null);
+
+  const onProveChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const file = e.target.files?.[0];
+    if (file) {
+      setProve(file);
+    }
+  };
+
+  return (
+    <div className="w-full bg-white">
+      <div className="bg-lapor-pink-light h-32 w-full"></div>
+      <Image
+        src="https://lh3.googleusercontent.com/a/ACg8ocKxzeAWJ7scN3ZvNiO24dhduRR7AveoTlH3WDPehIBauZw3XSmI=s96-c"
+        alt="Profile picture"
+        width={50}
+        height={50}
+        className="translate-x-5 -translate-y-5 rounded-full"
+      ></Image>
+
+      <div className="mx-5 -translate-y-4 text-lg">Username</div>
+
+      <hr />
+
+      <div className="mt-10 flex w-full flex-col gap-3">
+        {/* Title */}
+        <div className="flex w-full items-center justify-center">
+          <label
+            className="flex w-1/3 items-center justify-between"
+            htmlFor="title"
+          >
+            <div className="ml-5">Judul</div>
+            <div>:</div>
+          </label>
+          <input
+            className="bg-lapor-yellow mx-2 w-2/3 rounded-md px-2 py-1"
+            type="text"
+            placeholder="Masukkan judul..."
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+        </div>
+
+        {/* Description */}
+        <div className="flex w-full items-start justify-center">
+          <label
+            className="flex w-1/3 items-center justify-between"
+            htmlFor="description"
+          >
+            <div className="ml-5">Deskripsi</div>
+            <div>:</div>
+          </label>
+          <textarea
+            className="bg-lapor-yellow mx-2 h-40 w-2/3 rounded-md px-2 py-1"
+            placeholder="Masukkan deskripsi..."
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
+        </div>
+
+        {/* Status */}
+        <div className="flex w-full items-center justify-center">
+          <label
+            className="flex w-1/3 items-center justify-between"
+            htmlFor="status"
+          >
+            <div className="ml-5">Status</div>
+            <div>:</div>
+          </label>
+          <select
+            id="status"
+            className="bg-lapor-yellow mx-2 w-2/3 rounded-md px-2 py-1"
+            defaultValue={""}
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+          >
+            <option value="" disabled>
+              Pilih status laporan...
+            </option>
+            <option value="belum dilaporkan">belum dilaporkan</option>
+            <option value="sudah dilaporkan">sudah dilaporkan</option>
+            <option value="sudah diselesaikan">sudah diselesaikan</option>
+            <option value="laporan ditolak">laporan ditolak</option>
+          </select>
+        </div>
+
+        {/* City */}
+        <div className="flex w-full items-center justify-center">
+          <label
+            className="flex w-1/3 items-center justify-between"
+            htmlFor="kota"
+          >
+            <div className="ml-5">Kota</div>
+            <div>:</div>
+          </label>
+          <input
+            className="bg-lapor-yellow mx-2 w-2/3 rounded-md px-2 py-1"
+            type="text"
+            placeholder="Masukkan kota..."
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
+          />
+        </div>
+
+        {/* Prove */}
+        <div className="flex w-full items-center justify-center">
+          <label
+            className="flex w-1/3 items-center justify-between"
+            htmlFor="prove"
+          >
+            <div className="ml-5">Bukti</div>
+            <div>:</div>
+          </label>
+          <input
+            className="bg-lapor-yellow file:bg-lapor-green mx-2 w-2/3 rounded-md px-2 py-1 text-sm transition file:mr-3 file:rounded-md file:border-0 file:px-3 file:py-1 file:text-white hover:file:bg-green-800"
+            type="file"
+            accept="image/*"
+            onChange={onProveChange}
+          />
+        </div>
+
+        <div className="w-full flex justify-end items-center px-2 pt-2">
+          <button className="bg-lapor-black py-1 px-2 text-lapor-white w-20 rounded-md">
+            Submit
+          </button>
+        </div>
+      </div>
+
+      <Navbar />
+    </div>
+  );
+};
+
+export default Page;
