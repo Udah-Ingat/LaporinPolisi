@@ -5,11 +5,25 @@ import Navbar from "../_components/Navbar";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { api } from "@/trpc/react";
 
 const Page = () => {
+  const { mutate: createPost } = api.post.create.useMutation({
+    onSuccess: () => {
+      alert("Successfully created a post");
+      router.push("/");
+    },
+  });
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [status, setStatus] = useState("");
+  const [status, setStatus] = useState<
+    | ""
+    | "belum dilaporkan"
+    | "sudah dilaporkan"
+    | "sudah diselesaikan"
+    | "laporan ditolak"
+  >("");
   const [city, setCity] = useState("");
   const [, setProve] = useState<File | null>(null);
 
@@ -28,6 +42,14 @@ const Page = () => {
     if (file) {
       setProve(file);
     }
+  };
+
+  const handleSubmit = () => {
+    if (!title || !status) {
+      return;
+    }
+
+    createPost({ title, content: description, status, city, imgUrl: "" });
   };
 
   return (
@@ -94,7 +116,16 @@ const Page = () => {
             id="status"
             className="bg-lapor-yellow mx-2 w-2/3 rounded-md px-2 py-1"
             value={status}
-            onChange={(e) => setStatus(e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value as
+                | ""
+                | "belum dilaporkan"
+                | "sudah dilaporkan"
+                | "sudah diselesaikan"
+                | "laporan ditolak";
+
+              setStatus(value);
+            }}
           >
             <option value="" disabled>
               Pilih status laporan...
@@ -142,7 +173,10 @@ const Page = () => {
         </div>
 
         <div className="flex w-full items-center justify-end px-2 pt-2">
-          <button className="bg-lapor-black text-lapor-white w-20 rounded-md px-2 py-1">
+          <button
+            onClick={handleSubmit}
+            className="bg-lapor-black text-lapor-white w-20 rounded-md px-2 py-1"
+          >
             Submit
           </button>
         </div>
