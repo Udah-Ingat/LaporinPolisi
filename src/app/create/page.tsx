@@ -20,7 +20,7 @@ const Page = () => {
   };
 
   return (
-    <div className="w-full bg-white">
+    <div className="w-full bg-white min-h-screen">
       <div className="bg-lapor-pink-light h-28 w-full"></div>
       <Image
         src="https://lh3.googleusercontent.com/a/ACg8ocKxzeAWJ7scN3ZvNiO24dhduRR7AveoTlH3WDPehIBauZw3XSmI=s96-c"
@@ -82,7 +82,6 @@ const Page = () => {
           <select
             id="status"
             className="bg-lapor-yellow mx-2 w-2/3 rounded-md px-2 py-1"
-            defaultValue={""}
             value={status}
             onChange={(e) => setStatus(e.target.value)}
           >
