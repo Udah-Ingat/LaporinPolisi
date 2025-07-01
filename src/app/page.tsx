@@ -1,14 +1,15 @@
 import { auth } from "@/server/auth";
-import { api, HydrateClient } from "@/trpc/server";
+import { HydrateClient } from "@/trpc/server";
 import Navbar from "./_components/Navbar";
 import SearchBar from "./_components/SearchBar";
 import PostList from "./_components/PostList";
+import { redirect } from "next/navigation";
 
 export default async function Home() {
   const session = await auth();
 
-  if (session?.user) {
-    void api.post.getLatest.prefetch();
+  if (!session?.user) {
+    redirect("/login");
   }
 
   return (

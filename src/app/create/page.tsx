@@ -1,8 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from "../_components/Navbar";
 import Image from "next/image";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 const Page = () => {
   const [title, setTitle] = useState("");
@@ -10,6 +12,15 @@ const Page = () => {
   const [status, setStatus] = useState("");
   const [city, setCity] = useState("");
   const [, setProve] = useState<File | null>(null);
+
+  const router = useRouter();
+
+  const { data: session, status: statusSession } = useSession();
+  useEffect(() => {
+    if (statusSession == "unauthenticated") {
+      router.push("/login");
+    }
+  }, [router, statusSession]);
 
   const onProveChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
@@ -20,10 +31,10 @@ const Page = () => {
   };
 
   return (
-    <div className="w-full bg-white min-h-screen">
+    <div className="min-h-screen w-full bg-white">
       <div className="bg-lapor-pink-light h-28 w-full"></div>
       <Image
-        src="https://lh3.googleusercontent.com/a/ACg8ocKxzeAWJ7scN3ZvNiO24dhduRR7AveoTlH3WDPehIBauZw3XSmI=s96-c"
+        src={session?.user.image ?? "profile_icon.svg"}
         alt="Profile picture"
         width={50}
         height={50}
@@ -130,8 +141,8 @@ const Page = () => {
           />
         </div>
 
-        <div className="w-full flex justify-end items-center px-2 pt-2">
-          <button className="bg-lapor-black py-1 px-2 text-lapor-white w-20 rounded-md">
+        <div className="flex w-full items-center justify-end px-2 pt-2">
+          <button className="bg-lapor-black text-lapor-white w-20 rounded-md px-2 py-1">
             Submit
           </button>
         </div>
