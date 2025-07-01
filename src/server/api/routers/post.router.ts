@@ -104,4 +104,26 @@ export const postRouter = createTRPCRouter({
         totalPages: Math.ceil(total / input.limit),
       };
     }),
+
+  addPostVote: protectedProcedure
+    .input(
+      z.object({
+        postId: z.string(),
+        isUpVote: z.boolean(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+      await db
+        .insert(votes)
+        .values({
+          userId,
+          postId: input.postId,
+          isUpVote: input.isUpVote,
+        })
+        .onConflictDoUpdate({
+          target: [votes.userId, votes.postId],
+          set: { isUpVote: input.isUpVote, updatedAt: new Date() },
+        });
+    }),
 });

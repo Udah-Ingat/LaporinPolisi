@@ -1,5 +1,8 @@
+"use client";
+
+import { api } from "@/trpc/react";
 import Image from "next/image";
-import React from "react";
+import React, { useState } from "react";
 
 export type PostCardProps = {
   id: string;
@@ -24,6 +27,19 @@ const PostCard: React.FC<PostCardProps> = ({
   upVoteCount,
   isVerified,
 }) => {
+  const { mutate } = api.post.addPostVote.useMutation();
+  const [voteCount, setVoteCount] = useState(upVoteCount);
+
+  const onUpVoteClicked = () => {
+    setVoteCount((prev) => prev + 1);
+    mutate({ postId: id, isUpVote: true });
+  };
+
+  const onDownVoteClicked = () => {
+    setVoteCount((prev) => prev - 1);
+    mutate({ postId: id, isUpVote: false });
+  };
+
   return (
     <div
       onClick={() => alert("Clicked post: " + id)}
@@ -79,15 +95,17 @@ const PostCard: React.FC<PostCardProps> = ({
                 alt="up_arrow icon"
                 width="10"
                 height="10"
+                onClick={onUpVoteClicked}
               ></Image>
             </div>
-            <div>{upVoteCount}</div>
+            <div>{voteCount}</div>
             <div>
               <Image
                 src="down_arrow_icon.svg"
                 alt="down_arrow icon"
                 width="10"
                 height="10"
+                onClick={onDownVoteClicked}
               ></Image>
             </div>
           </div>

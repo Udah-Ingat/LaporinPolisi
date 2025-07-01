@@ -50,28 +50,27 @@ export const posts = createTable(
 );
 
 // Vote
-export const votes = createTable("vote", (d) => ({
-  id: d
-    .uuid()
-    .notNull()
-    .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
-  userId: d
-    .uuid()
-    .notNull()
-    .references(() => users.id),
-  postId: d
-    .uuid()
-    .notNull()
-    .references(() => posts.id),
-  isUpVote: d.boolean().notNull(),
-  createdAt: d
-    .timestamp({ withTimezone: true })
-    .default(sql`CURRENT_TIMESTAMP`)
-    .notNull(),
+export const votes = createTable(
+  "vote",
+  (d) => ({
+    userId: d
+      .uuid()
+      .notNull()
+      .references(() => users.id),
+    postId: d
+      .uuid()
+      .notNull()
+      .references(() => posts.id),
+    isUpVote: d.boolean().notNull(),
+    createdAt: d
+      .timestamp({ withTimezone: true })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
 
-  updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
-}));
+    updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
+  }),
+  (t) => [primaryKey({ columns: [t.userId, t.postId] })],
+);
 
 // User
 export const users = createTable("user", (d) => ({
