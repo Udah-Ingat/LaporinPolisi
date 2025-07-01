@@ -10,13 +10,30 @@ import { type AdapterAccount } from "next-auth/adapters";
  */
 export const createTable = pgTableCreator((name) => `laporinpolisi_${name}`);
 
+// Post
 export const posts = createTable(
   "post",
   (d) => ({
-    id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
-    name: d.varchar({ length: 256 }),
+    id: d
+      .uuid()
+      .notNull()
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    title: d.varchar({ length: 255 }).notNull(),
+    content: d.text(),
+    status: d.varchar({
+      enum: [
+        "",
+        "belum dilaporkan",
+        "sudah dilaporkan",
+        "sudah diselesaikan",
+        "laporan ditolak",
+      ],
+    }),
+    city: d.varchar({ length: 255 }),
+    imgUrl: d.varchar({ length: 255 }),
     createdById: d
-      .varchar({ length: 255 })
+      .uuid()
       .notNull()
       .references(() => users.id),
     createdAt: d
@@ -27,17 +44,43 @@ export const posts = createTable(
   }),
   (t) => [
     index("created_by_idx").on(t.createdById),
-    index("name_idx").on(t.name),
+    index("name_idx").on(t.title),
   ],
 );
 
+// Vote
+export const votes = createTable("vote", (d) => ({
+  id: d
+    .uuid()
+    .notNull()
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  userId: d
+    .uuid()
+    .notNull()
+    .references(() => users.id),
+  postId: d
+    .uuid()
+    .notNull()
+    .references(() => posts.id),
+  isUpVote: d.boolean().notNull(),
+  createdAt: d
+    .timestamp({ withTimezone: true })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+
+  updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
+}));
+
+// User
 export const users = createTable("user", (d) => ({
   id: d
-    .varchar({ length: 255 })
+    .uuid()
     .notNull()
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
   name: d.varchar({ length: 255 }),
+  aboutMe: d.text(),
   email: d.varchar({ length: 255 }).notNull(),
   emailVerified: d
     .timestamp({
@@ -56,7 +99,7 @@ export const accounts = createTable(
   "account",
   (d) => ({
     userId: d
-      .varchar({ length: 255 })
+      .uuid()
       .notNull()
       .references(() => users.id),
     type: d.varchar({ length: 255 }).$type<AdapterAccount["type"]>().notNull(),
@@ -85,7 +128,7 @@ export const sessions = createTable(
   (d) => ({
     sessionToken: d.varchar({ length: 255 }).notNull().primaryKey(),
     userId: d
-      .varchar({ length: 255 })
+      .uuid()
       .notNull()
       .references(() => users.id),
     expires: d.timestamp({ mode: "date", withTimezone: true }).notNull(),
