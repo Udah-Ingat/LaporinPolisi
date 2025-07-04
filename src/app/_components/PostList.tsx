@@ -12,7 +12,7 @@ const PostList = () => {
   return (
     <div className="flex h-full flex-col items-center justify-start gap-3">
       {posts?.items.length ? (
-        posts.items.map((post, i) => <PostCard key={i} {...post} />)
+        posts.items.map((post) => <PostCard key={post.id} {...post} />)
       ) : (
         <p>No posts</p>
       )}

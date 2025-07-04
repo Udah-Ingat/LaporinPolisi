@@ -33,11 +33,11 @@ const PostCard: React.FC<PostCardProps> = ({
   const router = useRouter();
 
   const { mutate } = api.post.addPostVote.useMutation();
-  const [voteCount, setVoteCount] = useState(upVoteCount);
+  const [voteCount, setVoteCount] = useState<number>(upVoteCount);
 
   const onUpVoteClicked = (e: React.MouseEvent<HTMLImageElement>) => {
     e.stopPropagation();
-    setVoteCount((prev) => prev + 1);
+    setVoteCount((prev) => (prev) + 1);
     mutate({ postId: id, isUpVote: true });
   };
 
@@ -113,7 +113,7 @@ const PostCard: React.FC<PostCardProps> = ({
                   alt="up_arrow icon"
                   width="10"
                   height="10"
-                  onClick={onUpVoteClicked}
+                  onClick={(e) => onUpVoteClicked(e)}
                   className="z-10 cursor-pointer"
                 ></Image>
               </div>
@@ -124,7 +124,7 @@ const PostCard: React.FC<PostCardProps> = ({
                   alt="down_arrow icon"
                   width="10"
                   height="10"
-                  onClick={onDownVoteClicked}
+                  onClick={(e) => onDownVoteClicked(e)}
                   className="z-10 cursor-pointer"
                 ></Image>
               </div>
