@@ -7,7 +7,7 @@ const SearchBar = () => {
   const [searchInput, setSearchInput] = useState("");
 
   return (
-    <div className="w-full px-5 py-5">
+    <div className="w-full px-5 py-5 min-h-min">
       <div className="bg-lapor-green flex w-full items-center justify-center gap-2 rounded-md py-2">
         <input
           placeholder="Cari laporan..."

@@ -17,12 +17,10 @@ const PostList = () => {
   if (isError) return <p>Error loading posts.</p>;
 
   return (
-    <div>
-      <div className="min-h-screen flex flex-col items-center justify-center gap-3">
-        {data?.items.map((post, index) => (
-          <PostCard {...post} key={index} />
-        ))}
-      </div>
+    <div className="flex h-full flex-col items-center justify-start gap-3">
+      {data?.items.map((post, index) => (
+        <PostCard {...post} key={index} />
+      ))}
     </div>
   );
 };
