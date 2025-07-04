@@ -3,6 +3,7 @@
 import { api } from "@/trpc/react";
 import Image from "next/image";
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export type PostCardProps = {
   id: string;
@@ -29,23 +30,31 @@ const PostCard: React.FC<PostCardProps> = ({
   upVoteCount,
   isVerified,
 }) => {
+  const router = useRouter();
+
   const { mutate } = api.post.addPostVote.useMutation();
   const [voteCount, setVoteCount] = useState(upVoteCount);
 
-  const onUpVoteClicked = () => {
+  const onUpVoteClicked = (e: React.MouseEvent<HTMLImageElement>) => {
+    e.stopPropagation();
     setVoteCount((prev) => prev + 1);
     mutate({ postId: id, isUpVote: true });
   };
 
-  const onDownVoteClicked = () => {
+  const onDownVoteClicked = (e: React.MouseEvent<HTMLImageElement>) => {
+    e.stopPropagation();
     setVoteCount((prev) => prev - 1);
     mutate({ postId: id, isUpVote: false });
+  };
+
+  const handleCardClicked = () => {
+    router.push("/post/" + id);
   };
 
   return (
     <div className="w-full">
       <div
-        onClick={() => alert("Clicked post: " + id)}
+        onClick={handleCardClicked}
         className="bg-lapor-yellow mx-4 flex items-center justify-center gap-2 rounded-2xl p-3 text-xs shadow-md/30"
       >
         <div className="flex w-2/3 flex-col items-center justify-center gap-2">
@@ -105,7 +114,7 @@ const PostCard: React.FC<PostCardProps> = ({
                   width="10"
                   height="10"
                   onClick={onUpVoteClicked}
-                  className="cursor-pointer"
+                  className="z-10 cursor-pointer"
                 ></Image>
               </div>
               <div>{voteCount}</div>
@@ -116,7 +125,7 @@ const PostCard: React.FC<PostCardProps> = ({
                   width="10"
                   height="10"
                   onClick={onDownVoteClicked}
-                  className="cursor-pointer"
+                  className="z-10 cursor-pointer"
                 ></Image>
               </div>
             </div>

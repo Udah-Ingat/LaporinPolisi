@@ -149,4 +149,58 @@ export const postRouter = createTRPCRouter({
           set: { isUpVote: input.isUpVote, updatedAt: new Date() },
         });
     }),
+
+  getPostById: protectedProcedure
+    .input(z.string())
+    .query(async ({ input: postId }) => {
+      const post = await db
+        .select({
+          id: posts.id,
+          title: posts.title,
+          content: posts.content,
+          city: posts.city,
+          imgUrl: posts.imgUrl,
+          createdAt: posts.createdAt,
+          updatedAt: posts.updatedAt,
+          isVerified: posts.isVerified,
+          userImage: users.image,
+          username: users.name,
+          upVoteCount: sql<number>`
+            COALESCE(
+                SUM(CASE 
+                WHEN ${votes.isUpVote} IS TRUE THEN 1
+                WHEN ${votes.isUpVote} IS FALSE THEN -1
+                ELSE 0
+                END), 
+                0
+            )
+            `.as("upVoteCount"),
+        })
+        .from(posts)
+        .leftJoin(users, eq(posts.createdById, users.id))
+        .leftJoin(votes, eq(votes.postId, posts.id))
+        .where(eq(posts.id, postId))
+        .groupBy(posts.id, users.id);
+
+      return {
+        id: post[0]?.id,
+        title: post[0]?.title,
+        content: post[0]?.content,
+        city: post[0]?.city,
+        imgUrl: post[0]?.imgUrl,
+        updatedAt: (() => {
+          const d = new Date(post[0]?.updatedAt ?? post[0]?.createdAt ?? "");
+          const day = d.getDate().toString().padStart(2, "0");
+          const month = (d.getMonth() + 1).toString().padStart(2, "0");
+          const year = d.getFullYear();
+          const hour = d.getHours().toString().padStart(2, "0");
+          const minute = d.getMinutes().toString().padStart(2, "0");
+          return `${day}-${month}-${year} : ${hour}.${minute}`;
+        })(),
+        isVerified: post[0]?.isVerified,
+        profileImgUrl: post[0]?.userImage ?? "",
+        username: post[0]?.username ?? "Unknown",
+        upVoteCount: post[0]?.upVoteCount ?? 0,
+      };
+    }),
 });
