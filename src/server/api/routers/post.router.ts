@@ -2,7 +2,7 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { posts, users, votes } from "@/server/db/schema";
 import { db } from "@/server/db";
-import { desc, count, eq, sql } from "drizzle-orm";
+import { desc, count, eq, sql, or, ilike } from "drizzle-orm";
 
 export const postRouter = createTRPCRouter({
   create: protectedProcedure
@@ -33,9 +33,10 @@ export const postRouter = createTRPCRouter({
       });
     }),
 
-  getAllPaginated: protectedProcedure
+  getFilteredPaginated: protectedProcedure
     .input(
       z.object({
+        filter: z.string().optional().default(""),
         page: z.number().min(1).default(1),
         limit: z.number().min(1).max(100).default(10),
       }),
@@ -69,8 +70,22 @@ export const postRouter = createTRPCRouter({
           .from(posts)
           .leftJoin(users, eq(posts.createdById, users.id))
           .leftJoin(votes, eq(votes.postId, posts.id))
+          .where(
+            or(
+              ilike(posts.title, `%${input.filter ?? ""}%`),
+              ilike(posts.content, `%${input.filter ?? ""}%`),
+              ilike(posts.city, `%${input.filter ?? ""}%`),
+              ilike(users.name, `%${input.filter ?? ""}%`),
+            //   ilike(sql`posts.created_at::text`, `%${input.filter ?? ""}%`),
+            ),
+          )
           .groupBy(posts.id, users.id)
-          .orderBy(desc(posts.createdAt))
+          .orderBy(
+            desc(
+              sql`COALESCE(SUM(CASE WHEN ${votes.isUpVote} THEN 1 ELSE -1 END), 0)`,
+            ),
+            desc(posts.createdAt),
+          )
           .limit(input.limit)
           .offset(offset),
 

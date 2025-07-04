@@ -1,26 +1,22 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import PostCard from "./PostCard";
-import { api } from "@/trpc/react";
+import { usePostStore } from "../_store/postStore";
 
 const PostList = () => {
-  const [page, setPage] = useState(1);
-  const limit = 10;
+  //   const [page, setPage] = useState(1);
+  //   const limit = 10;
 
-  const { data, isLoading, isError } = api.post.getAllPaginated.useQuery({
-    page,
-    limit,
-  });
-
-  if (isLoading) return <p>Loading...</p>;
-  if (isError) return <p>Error loading posts.</p>;
+  const posts = usePostStore((state) => state.posts);
 
   return (
     <div className="flex h-full flex-col items-center justify-start gap-3">
-      {data?.items.map((post, index) => (
-        <PostCard {...post} key={index} />
-      ))}
+      {posts?.items.length ? (
+        posts.items.map((post, i) => <PostCard key={i} {...post} />)
+      ) : (
+        <p>No posts</p>
+      )}
     </div>
   );
 };
