@@ -54,7 +54,13 @@ const Page = () => {
       base64 = await toBase64(prove);
     }
 
-    createPost({ title, content: description, status, city, imgBase64: base64 });
+    createPost({
+      title,
+      content: description,
+      status,
+      city,
+      imgBase64: base64,
+    });
   };
 
   return (
@@ -68,7 +74,9 @@ const Page = () => {
         className="translate-x-5 -translate-y-5 rounded-full"
       ></Image>
 
-      <div className="mx-5 -translate-y-4 text-lg">Username</div>
+      <div className="mx-5 -translate-y-4 text-lg">
+        {session?.user.name ?? "username"}
+      </div>
 
       <hr />
 
