@@ -32,7 +32,8 @@ const Page = () => {
       <div className="mx-5 -translate-y-4 text-lg">
         {session?.user.name ?? "username"}
       </div>
-      <div className="flex w-full items-center justify-center bg-white">
+      <hr />
+      <div className="flex w-full items-center justify-center bg-white py-5">
         <button className="p-2 bg-lapor-pink rounded-xl" onClick={() => signOut()}>
           Log Out
         </button>
