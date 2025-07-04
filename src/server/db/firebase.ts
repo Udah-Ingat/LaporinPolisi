@@ -2,13 +2,13 @@ import { initializeApp, type FirebaseOptions } from "firebase/app";
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig: FirebaseOptions = {
-  apiKey: "AIzaSyAbC6ncS6FQXo6WcmE4n9B-4oc9vJzcgSM",
-  authDomain: "maca-deb33.firebaseapp.com",
-  projectId: "maca-deb33",
-  storageBucket: "maca-deb33.appspot.com",
-  messagingSenderId: "299328119136",
-  appId: "1:299328119136:web:8f38ddf1d6bf0d92c1fe05",
-  measurementId: "G-FMTE1Z1WDC",
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY!,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN!,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID!,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET!,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID!,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID!,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
