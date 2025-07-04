@@ -14,7 +14,7 @@ export default async function Home() {
 
   return (
     <HydrateClient>
-      <main className="relative flex flex-col items-between h-screen w-full bg-white pb-20">
+      <main className="relative flex flex-col items-between min-h-screen w-full bg-white pb-20">
         <SearchBar />
         <PostList />
         <Navbar />
