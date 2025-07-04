@@ -94,6 +94,7 @@ const PostCard: React.FC<PostCardProps> = ({
                 alt="report icon"
                 width="20"
                 height="20"
+                className="cursor-pointer"
               ></Image>
             </div>
             <div className="bg-lapor-brown flex items-center justify-center gap-2 rounded-lg px-2 py-1 text-[10px] text-white">
@@ -104,6 +105,7 @@ const PostCard: React.FC<PostCardProps> = ({
                   width="10"
                   height="10"
                   onClick={onUpVoteClicked}
+                  className="cursor-pointer"
                 ></Image>
               </div>
               <div>{voteCount}</div>
@@ -114,6 +116,7 @@ const PostCard: React.FC<PostCardProps> = ({
                   width="10"
                   height="10"
                   onClick={onDownVoteClicked}
+                  className="cursor-pointer"
                 ></Image>
               </div>
             </div>

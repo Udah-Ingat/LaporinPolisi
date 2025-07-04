@@ -52,6 +52,7 @@ const SearchBar = () => {
           width={20}
           height={20}
           onClick={handleSearch}
+          className="cursor-pointer"
         ></Image>
       </div>
       {isLoading && <div>Loading...</div>}
