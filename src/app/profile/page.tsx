@@ -3,24 +3,41 @@
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
+import Image from "next/image";
+import Navbar from "../_components/Navbar";
 
 const Page = () => {
-  const { status } = useSession();
+  const { data: session, status: statusSession } = useSession();
   const router = useRouter();
 
   useEffect(() => {
-    if (status === "unauthenticated") {
+    if (statusSession === "unauthenticated") {
       router.push("/login");
     }
-  }, [status, router]);
+  }, [statusSession, router]);
 
-  if (status === "loading") return <div>Loading...</div>;
+  if (statusSession === "loading") return <div>Loading...</div>;
 
   return (
-    <div>
-      <button className="bg-white" onClick={() => signOut()}>
-        Log Out
-      </button>
+    <div className="min-h-screen w-full bg-white pb-20">
+      <div className="bg-lapor-pink-light h-28 w-full"></div>
+      <Image
+        src={session?.user.image ?? "profile_icon.svg"}
+        alt="Profile picture"
+        width={50}
+        height={50}
+        className="translate-x-5 -translate-y-5 rounded-full"
+      ></Image>
+
+      <div className="mx-5 -translate-y-4 text-lg">
+        {session?.user.name ?? "username"}
+      </div>
+      <div className="flex w-full items-center justify-center bg-white">
+        <button className="p-2 bg-lapor-pink rounded-xl" onClick={() => signOut()}>
+          Log Out
+        </button>
+      </div>
+      <Navbar />
     </div>
   );
 };
