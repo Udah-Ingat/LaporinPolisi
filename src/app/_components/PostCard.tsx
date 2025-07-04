@@ -47,8 +47,8 @@ const PostCard: React.FC<PostCardProps> = ({
         className="bg-lapor-yellow mx-4 flex items-center justify-center gap-2 rounded-2xl p-3 text-xs shadow-md/30"
       >
         <div className="flex w-2/3 flex-col items-center justify-center gap-2">
-          <div className="flex w-full items-center justify-center">
-            <div className="w-3/12 -translate-y-1 flex justify-end items-center pr-2">
+          <div className="flex w-full items-center justify-start">
+            <div className="-translate-y-1 flex justify-end items-center pr-2">
               <Image
                 src={profileImgUrl}
                 alt="test image"
@@ -67,7 +67,7 @@ const PostCard: React.FC<PostCardProps> = ({
               </div>
             </div>
           </div>
-          <div className="flex w-full items-center justify-start">
+          <div className="flex min-h-10 w-full items-start justify-start">
             <div>{title}</div>
           </div>
           <div className="flex items-center justify-center gap-2">
