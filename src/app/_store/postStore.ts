@@ -19,12 +19,16 @@ type postResultType = {
 
 interface PostStore {
   posts: postResultType | null;
+  page: number;
   setPosts: (posts: postResultType | undefined) => void;
+  setPage: (page: number) => void;
   clearPosts: () => void;
 }
 
 export const usePostStore = create<PostStore>((set) => ({
   posts: null,
+  page: 1,
   setPosts: (posts) => set({ posts: posts }),
+  setPage: (page) => set({ page: page }),
   clearPosts: () => set({ posts: null }),
 }));

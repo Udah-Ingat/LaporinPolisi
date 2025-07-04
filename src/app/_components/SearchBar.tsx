@@ -5,13 +5,16 @@ import Image from "next/image";
 import { api } from "@/trpc/react";
 import { usePostStore } from "../_store/postStore";
 
+const LIMIT = 4;
+
 const SearchBar = () => {
   const [searchInput, setSearchInput] = useState("");
   const setPosts = usePostStore((state) => state.setPosts);
+  const page = usePostStore((state) => state.page);
 
   const { isLoading, isError, refetch } =
     api.post.getFilteredPaginated.useQuery(
-      { page: 1, limit: 10, filter: searchInput },
+      { page: page, limit: LIMIT, filter: searchInput },
       { enabled: false },
     );
 
@@ -31,7 +34,7 @@ const SearchBar = () => {
     };
 
     void fetchAndStore();
-  }, [refetch, setPosts]);
+  }, [refetch, setPosts, page]);
 
   return (
     <div className="flex min-h-min w-full flex-col px-5 py-5">
