@@ -1,6 +1,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+import HomeIcon from "public/home_icon.svg"
+import CreateIcon from "public/create_icon.svg";
+import ProfileIcon from "public/profile_icon.svg";
 
 const Navbar = () => {
   return (
@@ -8,7 +11,7 @@ const Navbar = () => {
       <div className="flex items-center justify-around">
         <Link href={"/"}>
           <Image
-            src="home_icon.svg"
+            src={HomeIcon as string}
             alt="home icon"
             width="28"
             height="28"
@@ -16,7 +19,7 @@ const Navbar = () => {
         </Link>
         <Link href={"/create"}>
           <Image
-            src="create_icon.svg"
+            src={CreateIcon as string}
             alt="create icon"
             width="28"
             height="28"
@@ -24,7 +27,7 @@ const Navbar = () => {
         </Link>
         <Link href={"/profile"}>
           <Image
-            src="profile_icon.svg"
+            src={ProfileIcon as string}
             alt="profile icon"
             width="28"
             height="28"
