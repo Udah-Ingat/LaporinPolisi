@@ -9,6 +9,7 @@ export type PostCardProps = {
   profileImgUrl: string;
   username: string;
   title: string;
+  content: string | null;
   city: string | null;
   updatedAt: string;
   imgUrl: string | null;
@@ -21,6 +22,7 @@ const PostCard: React.FC<PostCardProps> = ({
   profileImgUrl,
   username,
   title,
+  content,
   city,
   updatedAt,
   imgUrl,
@@ -48,7 +50,7 @@ const PostCard: React.FC<PostCardProps> = ({
       >
         <div className="flex w-2/3 flex-col items-center justify-center gap-2">
           <div className="flex w-full items-center justify-start">
-            <div className="-translate-y-1 flex justify-end items-center pr-2">
+            <div className="flex -translate-y-1 items-center justify-end pr-2">
               <Image
                 src={profileImgUrl}
                 alt="test image"
@@ -57,8 +59,8 @@ const PostCard: React.FC<PostCardProps> = ({
                 className="h-8 w-8 rounded-full object-cover"
               ></Image>
             </div>
-            <div className="w-9/12 flex flex-col items-center justify-center gap-1">
-              <div className="bg-lapor-green w-full rounded-lg px-2 py-[1px] truncate text-white">
+            <div className="flex w-9/12 flex-col items-center justify-center gap-1">
+              <div className="bg-lapor-green w-full truncate rounded-lg px-2 py-[1px] text-white">
                 {username}
               </div>
               <div className="text-lapor-gray flex w-full items-center justify-between text-[9px]">
@@ -67,8 +69,13 @@ const PostCard: React.FC<PostCardProps> = ({
               </div>
             </div>
           </div>
-          <div className="flex min-h-10 w-full items-start justify-start">
-            <div>{title}</div>
+          <div className="flex max-h-30 min-h-10 w-full flex-col items-start justify-start">
+            <div className="text-[14px] font-semibold text-gray-800">
+              {title}
+            </div>
+            <div className="line-clamp-3 w-full font-light text-ellipsis text-gray-800">
+              {content}
+            </div>
           </div>
           <div className="flex items-center justify-center gap-2">
             <div>

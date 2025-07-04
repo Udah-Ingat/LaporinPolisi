@@ -4,6 +4,7 @@ type postResultType = {
   items: {
     id: string;
     title: string;
+    content: string | null;
     city: string | null;
     imgUrl: string | null;
     updatedAt: string;

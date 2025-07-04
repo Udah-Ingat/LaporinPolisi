@@ -55,6 +55,7 @@ export const postRouter = createTRPCRouter({
           .select({
             id: posts.id,
             title: posts.title,
+            content: posts.content,
             city: posts.city,
             imgUrl: posts.imgUrl,
             createdAt: posts.createdAt,
@@ -104,6 +105,7 @@ export const postRouter = createTRPCRouter({
         items: items.map((item) => ({
           id: item.id,
           title: item.title,
+          content: item.content,
           city: item.city,
           imgUrl: item.imgUrl,
           updatedAt: (() => {
