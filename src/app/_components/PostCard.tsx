@@ -58,7 +58,7 @@ const PostCard: React.FC<PostCardProps> = ({
           </div>
           <div className="flex w-full flex-col items-center justify-center gap-1">
             <div className="bg-lapor-green w-full rounded-lg px-2 py-[1px] text-white">
-              {username}
+              {username.length > 20 ? username.slice(0, 20) + "..." : username}
             </div>
             <div className="text-lapor-gray flex w-full items-center justify-between text-[9px]">
               <div>{city}</div>
