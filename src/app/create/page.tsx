@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { api } from "@/trpc/react";
+import { toBase64 } from "@/lib/fileHelper";
 
 const Page = () => {
   const { mutate: createPost } = api.post.create.useMutation({
@@ -25,7 +26,7 @@ const Page = () => {
     | "laporan ditolak"
   >("");
   const [city, setCity] = useState("");
-  const [, setProve] = useState<File | null>(null);
+  const [prove, setProve] = useState<File | undefined>(undefined);
 
   const router = useRouter();
 
@@ -44,16 +45,20 @@ const Page = () => {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!title || !status) {
       return;
     }
+    let base64 = undefined;
+    if (prove) {
+      base64 = await toBase64(prove);
+    }
 
-    createPost({ title, content: description, status, city, imgUrl: "" });
+    createPost({ title, content: description, status, city, imgBase64: base64 });
   };
 
   return (
-    <div className="min-h-screen w-full bg-white">
+    <div className="min-h-screen w-full bg-white pb-20">
       <div className="bg-lapor-pink-light h-28 w-full"></div>
       <Image
         src={session?.user.image ?? "profile_icon.svg"}

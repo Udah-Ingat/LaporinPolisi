@@ -3,6 +3,7 @@ import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { posts, users, votes } from "@/server/db/schema";
 import { db } from "@/server/db";
 import { desc, count, eq, sql, or, ilike } from "drizzle-orm";
+import { uploadBase64Image } from "@/lib/fileHelper";
 
 export const postRouter = createTRPCRouter({
   create: protectedProcedure
@@ -18,17 +19,22 @@ export const postRouter = createTRPCRouter({
           "laporan ditolak",
         ]),
         city: z.string().optional(),
-        imgUrl: z.string().optional(),
+        imgBase64: z.string().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.session.user.id;
+      let imgUrl = null;
+      if (input.imgBase64) {
+        imgUrl = await uploadBase64Image(input.imgBase64);
+      }
+
       await db.insert(posts).values({
         title: input.title,
         content: input.content,
         status: input.status,
         city: input.city,
-        imgUrl: input.imgUrl,
+        imgUrl,
         createdById: userId,
       });
     }),
@@ -76,7 +82,7 @@ export const postRouter = createTRPCRouter({
               ilike(posts.content, `%${input.filter ?? ""}%`),
               ilike(posts.city, `%${input.filter ?? ""}%`),
               ilike(users.name, `%${input.filter ?? ""}%`),
-            //   ilike(sql`posts.created_at::text`, `%${input.filter ?? ""}%`),
+              //   ilike(sql`posts.created_at::text`, `%${input.filter ?? ""}%`),
             ),
           )
           .groupBy(posts.id, users.id)
